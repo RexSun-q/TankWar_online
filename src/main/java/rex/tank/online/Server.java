@@ -23,7 +23,10 @@ public class Server {
                     .childHandler(new ChannelInitializer<>() {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
-                            ch.pipeline().addLast(new ServerChannelHandler());
+                            ch.pipeline()
+                                    .addLast(new TankMsgEncoder())
+                                    .addLast(new TankMsgDecoder())
+                                    .addLast(new ServerChannelHandler());
                         }
                     })
                     .bind(8888)
@@ -56,6 +59,11 @@ class ServerChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TankMsg msg) throws Exception {
         System.out.println(msg);
-        Server.channels.writeAndFlush(msg);
+        for (Channel c : Server.channels) {
+            if (ctx.channel() != c) {
+                c.writeAndFlush(msg);
+            }
+        }
+        // Server.channels.writeAndFlush(msg);
     }
 }

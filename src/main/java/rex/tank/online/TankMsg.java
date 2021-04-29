@@ -2,6 +2,7 @@ package rex.tank.online;
 
 import rex.tank.Dir;
 import rex.tank.Group;
+import rex.tank.Tank;
 import rex.tank.TankFrame;
 
 import java.io.ByteArrayOutputStream;
@@ -28,6 +29,15 @@ public class TankMsg {
         this.moving = moving;
         this.group = group;
         this.uuid = uuid;
+    }
+
+    public TankMsg(Tank tank) {
+        this.x = tank.getX();
+        this.y = tank.getY();
+        this.dir = tank.getDir();
+        this.moving = tank.getMoving();
+        this.group = tank.getGroup();
+        this.uuid = tank.getUuid();
     }
 
     public byte[] toBytes() {

@@ -124,4 +124,8 @@ public class Tank {
     public UUID getUuid() {
         return uuid;
     }
+
+    public boolean getMoving() {
+        return moving;
+    }
 }

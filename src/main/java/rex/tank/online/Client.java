@@ -7,6 +7,12 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import rex.tank.Dir;
+import rex.tank.Group;
+import rex.tank.Tank;
+import rex.tank.TankFrame;
+
+import java.util.UUID;
 
 public class Client {
 
@@ -19,7 +25,10 @@ public class Client {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast(new ClientChannelHandler());
+                            ch.pipeline()
+                                    .addLast(new TankMsgEncoder())
+                                    .addLast(new TankMsgDecoder())
+                                    .addLast(new ClientChannelHandler());
                         }
                     })
                     .connect("localhost", 8888)
@@ -34,10 +43,21 @@ public class Client {
     }
 }
 
-class ClientChannelHandler extends ChannelInboundHandlerAdapter {
+class ClientChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ByteBuf buf = Unpooled.copiedBuffer("Hello".getBytes());
-        ctx.writeAndFlush(buf);
+        TankMsg msg = new TankMsg(TankFrame.getINSTANCE().myTank);
+        ctx.writeAndFlush(msg);
+    }
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, TankMsg msg) throws Exception {
+        int x = msg.x;
+        int y = msg.y;
+        Dir dir = msg.dir;
+        Group g = msg.group;
+        UUID id = msg.uuid; // TODO:
+        boolean isMoving = msg.moving;
+        TankFrame.getINSTANCE().enemyTanks.add(new Tank(x, y, dir, g, isMoving, TankFrame.getINSTANCE()));
     }
 }

@@ -22,6 +22,6 @@ public class Main {
             }
         }).start();
 
-        // tankFrame.client.connect();
+        tankFrame.client.connect();
     }
 }

@@ -15,10 +15,10 @@ public class TankFrame extends Frame {
     private static TankFrame INSTANCE = new TankFrame();
     public Client client = new Client();
 
-    Tank myTank = new Tank(new Random().nextInt(GAME_WIDTH), new Random().nextInt(GAME_HEIGHT), Dir.values()[new Random().nextInt(4)], Group.GOOD, false,this);
-    List<Tank> enemyTanks = new ArrayList<>();
-    List<Bullet> bulletList = new ArrayList<>();
-    List<Explode> explodes = new ArrayList<>();
+    public Tank myTank = new Tank(new Random().nextInt(GAME_WIDTH), new Random().nextInt(GAME_HEIGHT), Dir.values()[new Random().nextInt(4)], Group.GOOD, false,this);
+    public List<Tank> enemyTanks = new ArrayList<>();
+    public List<Bullet> bulletList = new ArrayList<>();
+    public List<Explode> explodes = new ArrayList<>();
 
     // Client client = Client.getINSTANCE(); // client instance
 
