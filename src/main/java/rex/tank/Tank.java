@@ -2,6 +2,7 @@ package rex.tank;
 
 import java.awt.*;
 import java.util.Random;
+import java.util.UUID;
 
 public class Tank {
     private static final int SPEED = 3;
@@ -11,19 +12,21 @@ public class Tank {
     private Dir dir;
     // public GameModel gm;
     public TankFrame tf;
-    private boolean moving = true;
+    private boolean moving = false;
     private boolean alive = true;
     private Group group;
     private Random random = new Random();
+    private UUID uuid = UUID.randomUUID();
 
     public static final int WIDTH = ResourceMngr.tankD.getWidth();
     public static final int HEIGHT = ResourceMngr.tankD.getHeight();
 
-    public Tank(int x, int y, Dir dir, Group group,TankFrame tf) {
+    public Tank(int x, int y, Dir dir, Group group, boolean moving,TankFrame tf) {
         this.x = x;
         this.y = y;
         this.dir = dir;
         this.tf = tf;
+        this.moving = moving;
         this.group = group;
     }
 
@@ -39,6 +42,10 @@ public class Tank {
             tf.enemyTanks.remove(this);
             return;
         }
+        Color c = g.getColor();
+        g.setColor(Color.yellow);
+        g.drawString(uuid.toString(), x, y - 10);
+        g.setColor(c);
         switch (dir) {
             case LEFT:
                 g.drawImage(ResourceMngr.tankL, x, y, null);
@@ -113,4 +120,8 @@ public class Tank {
     }
 
     public Group getGroup() { return group; }
+
+    public UUID getUuid() {
+        return uuid;
+    }
 }

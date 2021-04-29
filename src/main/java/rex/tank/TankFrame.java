@@ -1,5 +1,7 @@
 package rex.tank;
 
+import rex.tank.online.Client;
+
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -7,20 +9,25 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class TankFrame extends Frame {
-    Tank myTank = new Tank(50, 50, Dir.DOWN, Group.GOOD,this);
+    private static TankFrame INSTANCE = new TankFrame();
+    public Client client = new Client();
+
+    Tank myTank = new Tank(new Random().nextInt(GAME_WIDTH), new Random().nextInt(GAME_HEIGHT), Dir.values()[new Random().nextInt(4)], Group.GOOD, false,this);
     List<Tank> enemyTanks = new ArrayList<>();
     List<Bullet> bulletList = new ArrayList<>();
     List<Explode> explodes = new ArrayList<>();
 
+    // Client client = Client.getINSTANCE(); // client instance
+
     public static final int GAME_WIDTH = 800, GAME_HEIGHT = 600;
 
-    public TankFrame() {
+    private TankFrame() {
         this.setResizable(false);
         this.setTitle("Tank War");
         this.setSize(GAME_WIDTH, GAME_HEIGHT);
-        this.setVisible(true);
 
         this.addKeyListener(new MyKeyListener());
         this.addWindowListener(new WindowAdapter() {
@@ -30,6 +37,8 @@ public class TankFrame extends Frame {
             }
         });
     }
+
+    public static TankFrame getINSTANCE() { return INSTANCE; }
 
     // 双缓冲解决闪烁
     Image offScreenImage = null;
