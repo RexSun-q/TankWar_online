@@ -1,5 +1,7 @@
 package rex.tank;
 
+import rex.tank.online.TankMsg;
+
 import java.awt.*;
 import java.util.Random;
 import java.util.UUID;
@@ -28,6 +30,16 @@ public class Tank {
         this.tf = tf;
         this.moving = moving;
         this.group = group;
+    }
+
+    public Tank(TankMsg msg, TankFrame tf) {
+        this.x = msg.x;
+        this.y = msg.y;
+        this.dir = msg.dir;
+        this.tf = tf;
+        this.moving = msg.moving;
+        this.group = msg.group;
+        this.uuid = msg.uuid;
     }
 
     public void setMoving(Boolean isMoving) {

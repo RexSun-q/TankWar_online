@@ -52,12 +52,11 @@ class ClientChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TankMsg msg) throws Exception {
-        int x = msg.x;
-        int y = msg.y;
-        Dir dir = msg.dir;
-        Group g = msg.group;
-        UUID id = msg.uuid; // TODO:
-        boolean isMoving = msg.moving;
-        TankFrame.getINSTANCE().enemyTanks.add(new Tank(x, y, dir, g, isMoving, TankFrame.getINSTANCE()));
+        if (msg.uuid.equals(TankFrame.getINSTANCE().myTank.getUuid()) ||
+                TankFrame.getINSTANCE().findbyUUID(msg.uuid) != null) return;
+
+        TankFrame.getINSTANCE().enemyTanks.put(msg.uuid, new Tank(msg, TankFrame.getINSTANCE()));
+        TankMsg myTankMsg = new TankMsg(TankFrame.getINSTANCE().myTank);
+        ctx.writeAndFlush(myTankMsg);
     }
 }

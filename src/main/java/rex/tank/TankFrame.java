@@ -7,16 +7,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Random;
 
 public class TankFrame extends Frame {
     private static TankFrame INSTANCE = new TankFrame();
     public Client client = new Client();
 
     public Tank myTank = new Tank(new Random().nextInt(GAME_WIDTH), new Random().nextInt(GAME_HEIGHT), Dir.values()[new Random().nextInt(4)], Group.GOOD, false,this);
-    public List<Tank> enemyTanks = new ArrayList<>();
+    public HashMap<UUID, Tank> enemyTanks = new LinkedHashMap<>();
     public List<Bullet> bulletList = new ArrayList<>();
     public List<Explode> explodes = new ArrayList<>();
 
@@ -67,8 +66,8 @@ public class TankFrame extends Frame {
         g.setColor(c);
 
         myTank.paint(g);
-        for (int i = 0; i < enemyTanks.size(); i++) {
-            enemyTanks.get(i).paint(g);
+        for (Tank tank : enemyTanks.values()) {
+            tank.paint(g);
         }
 
         for (int i = 0; i < bulletList.size(); i++) {
@@ -86,6 +85,10 @@ public class TankFrame extends Frame {
             }
         }
 
+    }
+
+    public Tank findbyUUID(UUID uuid) {
+        return enemyTanks.get(uuid);
     }
 
     class MyKeyListener extends KeyAdapter {

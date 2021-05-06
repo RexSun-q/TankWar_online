@@ -59,11 +59,6 @@ class ServerChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, TankMsg msg) throws Exception {
         System.out.println(msg);
-        for (Channel c : Server.channels) {
-            if (ctx.channel() != c) {
-                c.writeAndFlush(msg);
-            }
-        }
-        // Server.channels.writeAndFlush(msg);
+        Server.channels.writeAndFlush(msg);
     }
 }
