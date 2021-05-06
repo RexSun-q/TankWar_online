@@ -1,26 +1,21 @@
 package rex.tank.online;
 
-import rex.tank.Dir;
-import rex.tank.Group;
-import rex.tank.Tank;
-import rex.tank.TankFrame;
+import io.netty.channel.ChannelHandlerContext;
+import rex.tank.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Random;
+import java.io.*;
 import java.util.UUID;
 
-public class TankMsg {
+public class TankMsg extends Msg {
     public int x;
     public int y;
     public Dir dir;
     public boolean moving;
     public Group group;
     public UUID uuid;
+    private MsgType type = MsgType.TankMsg;
 
-    public TankMsg() {
-    }
+    public TankMsg() { }
 
     public TankMsg(int x, int y, Dir dir, boolean moving, Group group, UUID uuid) {
         this.x = x;
@@ -40,6 +35,17 @@ public class TankMsg {
         this.uuid = tank.getUuid();
     }
 
+    @Override
+    public void handle(ChannelHandlerContext ctx) {
+        if (this.uuid.equals(TankFrame.getINSTANCE().myTank.getUuid()) ||
+                TankFrame.getINSTANCE().findByUUID(uuid) != null) return;
+
+        TankFrame.getINSTANCE().enemyTanks.put(uuid, new Tank(this, TankFrame.getINSTANCE()));
+        TankMsg myTankMsg = new TankMsg(TankFrame.getINSTANCE().myTank);
+        ctx.writeAndFlush(myTankMsg);
+    }
+
+    @Override
     public byte[] toBytes() {
         ByteArrayOutputStream bos = null;
         DataOutputStream dos = null;
@@ -58,8 +64,41 @@ public class TankMsg {
             bytes = bos.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                dos.close();
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return bytes;
+    }
+
+    @Override
+    public void parse(byte[] bytes) {
+        DataInputStream dis = new DataInputStream(new ByteArrayInputStream(bytes));
+        try {
+            x = dis.readInt();
+            y = dis.readInt();
+            dir = Dir.values()[dis.readInt()];
+            moving = dis.readBoolean();
+            group = Group.values()[dis.readInt()];
+            uuid = new UUID(dis.readLong(), dis.readLong());
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                dis.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    @Override
+    public MsgType getType() {
+        return type;
     }
 
     @Override
@@ -73,4 +112,6 @@ public class TankMsg {
                 ", uuid=" + uuid +
                 '}';
     }
+
+
 }

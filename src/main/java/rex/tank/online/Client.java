@@ -1,20 +1,18 @@
 package rex.tank.online;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import rex.tank.Dir;
-import rex.tank.Group;
-import rex.tank.Tank;
 import rex.tank.TankFrame;
 
-import java.util.UUID;
-
 public class Client {
+
+    public static Client INSTANCE = new Client();
+    Channel channel = null;
+
+    private Client() {}
 
     public void connect() {
         EventLoopGroup group = new NioEventLoopGroup(1);
@@ -26,13 +24,24 @@ public class Client {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new TankMsgEncoder())
-                                    .addLast(new TankMsgDecoder())
+                                    .addLast(new MsgEncoder())
+                                    .addLast(new MsgDecoder())
                                     .addLast(new ClientChannelHandler());
                         }
                     })
                     .connect("localhost", 8888)
                     .sync();
+
+            future.addListener(new ChannelFutureListener() {
+                @Override
+                public void operationComplete(ChannelFuture future) throws Exception {
+                    if (future.isSuccess()) {
+                        channel = future.channel();
+                    } else {
+                        System.out.printf("connection is failed");
+                    }
+                }
+            });
 
             future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
@@ -41,22 +50,23 @@ public class Client {
             group.shutdownGracefully();
         }
     }
+
+    public static Client getInstance() { return INSTANCE; }
+
+    public void sendMsg(Msg msg) {
+        channel.writeAndFlush(msg);
+    }
 }
 
-class ClientChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
+class ClientChannelHandler extends SimpleChannelInboundHandler<Msg> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        TankMsg msg = new TankMsg(TankFrame.getINSTANCE().myTank);
+        Msg msg = new TankMsg(TankFrame.getINSTANCE().myTank);
         ctx.writeAndFlush(msg);
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, TankMsg msg) throws Exception {
-        if (msg.uuid.equals(TankFrame.getINSTANCE().myTank.getUuid()) ||
-                TankFrame.getINSTANCE().findbyUUID(msg.uuid) != null) return;
-
-        TankFrame.getINSTANCE().enemyTanks.put(msg.uuid, new Tank(msg, TankFrame.getINSTANCE()));
-        TankMsg myTankMsg = new TankMsg(TankFrame.getINSTANCE().myTank);
-        ctx.writeAndFlush(myTankMsg);
+    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
+        msg.handle(ctx);
     }
 }

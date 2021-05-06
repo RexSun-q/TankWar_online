@@ -1,6 +1,7 @@
 package rex.tank;
 
 import rex.tank.online.Client;
+import rex.tank.online.TankMoveMsg;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -12,7 +13,7 @@ import java.util.List;
 
 public class TankFrame extends Frame {
     private static TankFrame INSTANCE = new TankFrame();
-    public Client client = new Client();
+    public Client client = Client.getInstance();
 
     public Tank myTank = new Tank(new Random().nextInt(GAME_WIDTH), new Random().nextInt(GAME_HEIGHT), Dir.values()[new Random().nextInt(4)], Group.GOOD, false,this);
     public HashMap<UUID, Tank> enemyTanks = new LinkedHashMap<>();
@@ -87,7 +88,7 @@ public class TankFrame extends Frame {
 
     }
 
-    public Tank findbyUUID(UUID uuid) {
+    public Tank findByUUID(UUID uuid) {
         return enemyTanks.get(uuid);
     }
 
@@ -116,6 +117,7 @@ public class TankFrame extends Frame {
                     break;
             }
             setMainTankDir();
+            client.sendMsg(new TankMoveMsg(myTank));
         }
 
         @Override
@@ -141,10 +143,10 @@ public class TankFrame extends Frame {
                     break;
             }
             setMainTankDir();
+            client.sendMsg(new TankMoveMsg(myTank));
         }
 
         private void setMainTankDir() {
-//            Tank myTank = gm.myTank;
             if (!BD && !BL && !BR && !BU) {
                 myTank.setMoving(false);
             } else {

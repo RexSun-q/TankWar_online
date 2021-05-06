@@ -1,13 +1,11 @@
 package rex.tank.online;
 
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.GlobalEventExecutor;
 
 public class Server {
@@ -24,8 +22,8 @@ public class Server {
                         @Override
                         protected void initChannel(Channel ch) throws Exception {
                             ch.pipeline()
-                                    .addLast(new TankMsgEncoder())
-                                    .addLast(new TankMsgDecoder())
+                                    .addLast(new MsgEncoder())
+                                    .addLast(new MsgDecoder())
                                     .addLast(new ServerChannelHandler());
                         }
                     })
@@ -49,7 +47,7 @@ public class Server {
     }
 }
 
-class ServerChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
+class ServerChannelHandler extends SimpleChannelInboundHandler<Msg> {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         System.out.println(ctx.channel().id()+"connected");
@@ -57,7 +55,7 @@ class ServerChannelHandler extends SimpleChannelInboundHandler<TankMsg> {
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, TankMsg msg) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
         System.out.println(msg);
         Server.channels.writeAndFlush(msg);
     }
