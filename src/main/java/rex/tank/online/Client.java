@@ -67,6 +67,6 @@ class ClientChannelHandler extends SimpleChannelInboundHandler<Msg> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Msg msg) throws Exception {
-        msg.handle(ctx);
+        msg.handle();
     }
 }

@@ -26,20 +26,22 @@ public class MsgDecoder extends ByteToMessageDecoder {
         byte[] bytes = new byte[msgLength];
         in.readBytes(bytes);
 
+        Msg msg = null;
         switch (msgType) {
             case TankMsg:
-                TankMsg tankMsg = new TankMsg();
-                tankMsg.parse(bytes);
-                out.add(tankMsg);
+                msg = new TankMsg();
                 break;
             case TankMoveMsg:
-                TankMoveMsg tankMoveMsg = new TankMoveMsg();
-                tankMoveMsg.parse(bytes);
-                out.add(tankMoveMsg);
+                msg = new TankMoveMsg();
+                break;
+            case TankStopMsg:
+                msg = new TankStopMsg();
                 break;
             default:
                 break;
         }
 
+        msg.parse(bytes);
+        out.add(msg);
     }
 }

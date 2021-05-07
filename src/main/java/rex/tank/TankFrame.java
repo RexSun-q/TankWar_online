@@ -2,6 +2,7 @@ package rex.tank;
 
 import rex.tank.online.Client;
 import rex.tank.online.TankMoveMsg;
+import rex.tank.online.TankStopMsg;
 
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -117,7 +118,6 @@ public class TankFrame extends Frame {
                     break;
             }
             setMainTankDir();
-            client.sendMsg(new TankMoveMsg(myTank));
         }
 
         @Override
@@ -143,11 +143,11 @@ public class TankFrame extends Frame {
                     break;
             }
             setMainTankDir();
-            client.sendMsg(new TankMoveMsg(myTank));
         }
 
         private void setMainTankDir() {
             if (!BD && !BL && !BR && !BU) {
+                client.sendMsg(new TankStopMsg(myTank));
                 myTank.setMoving(false);
             } else {
                 myTank.setMoving(true);
@@ -155,6 +155,8 @@ public class TankFrame extends Frame {
                 if (BR) myTank.setDir(Dir.RIGHT);
                 if (BU) myTank.setDir(Dir.UP);
                 if (BD) myTank.setDir(Dir.DOWN);
+
+                client.sendMsg(new TankMoveMsg(myTank));
             }
         }
     }
