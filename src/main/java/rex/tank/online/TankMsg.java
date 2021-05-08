@@ -40,7 +40,7 @@ public class TankMsg extends Msg {
         if (this.uuid.equals(TankFrame.getINSTANCE().myTank.getUuid()) ||
                 TankFrame.getINSTANCE().findByUUID(uuid) != null) return;
 
-        TankFrame.getINSTANCE().enemyTanks.put(uuid, new Tank(this, TankFrame.getINSTANCE()));
+        TankFrame.getINSTANCE().enemyTanks.put(uuid, new Tank(this, Group.BAD, TankFrame.getINSTANCE()));
         TankMsg myTankMsg = new TankMsg(TankFrame.getINSTANCE().myTank);
         Client.getInstance().channel.writeAndFlush(myTankMsg);
     }

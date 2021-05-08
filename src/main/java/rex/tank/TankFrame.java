@@ -21,8 +21,6 @@ public class TankFrame extends Frame {
     public List<Bullet> bulletList = new ArrayList<>();
     public List<Explode> explodes = new ArrayList<>();
 
-    // Client client = Client.getINSTANCE(); // client instance
-
     public static final int GAME_WIDTH = 800, GAME_HEIGHT = 600;
 
     private TankFrame() {
@@ -82,8 +80,8 @@ public class TankFrame extends Frame {
 
         // 碰撞检测
         for (int i = 0; i < bulletList.size(); i++) {
-            for (int j = 0; j < enemyTanks.size(); j++) {
-                bulletList.get(i).collideWith(enemyTanks.get(j));
+            for (Tank tank : enemyTanks.values()) {
+                bulletList.get(i).collideWith(tank);
             }
         }
 
@@ -148,15 +146,16 @@ public class TankFrame extends Frame {
         private void setMainTankDir() {
             if (!BD && !BL && !BR && !BU) {
                 client.sendMsg(new TankStopMsg(myTank));
+                // TODO: 如果方向有改变时需要发送修正方向的信息
                 myTank.setMoving(false);
             } else {
-                myTank.setMoving(true);
                 if (BL) myTank.setDir(Dir.LEFT);
                 if (BR) myTank.setDir(Dir.RIGHT);
                 if (BU) myTank.setDir(Dir.UP);
                 if (BD) myTank.setDir(Dir.DOWN);
 
                 client.sendMsg(new TankMoveMsg(myTank));
+                myTank.setMoving(true);
             }
         }
     }

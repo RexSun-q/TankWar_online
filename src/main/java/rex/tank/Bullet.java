@@ -12,24 +12,22 @@ public class Bullet {
     private int x, y;
     private Dir dir;
     //private GameModel gm;
-    public TankFrame tf;
     private Rectangle selfRect = new Rectangle();
 
     private boolean alive = true;
     private Group group;
 
-    public Bullet(int x, int y, Dir dir, Group group,TankFrame tf) {
+
+
+    public Bullet(int x, int y, Dir dir, Group group) {
         this.x = x;
         this.y = y;
         this.dir = dir;
-        this.tf = tf;
         this.group = group;
         selfRect.x = x;
         selfRect.y = y;
         selfRect.width = width;
         selfRect.height = height;
-
-        tf.bulletList.add(this);
     }
 
     public void setAlive(Boolean isAlive) { alive = isAlive; }
@@ -64,7 +62,7 @@ public class Bullet {
 
     private void move(Dir dir) {
         if (!alive) {
-            tf.bulletList.remove(this);
+            TankFrame.getINSTANCE().bulletList.remove(this);
             return;
         }
         switch (dir) {
@@ -89,5 +87,15 @@ public class Bullet {
         selfRect.y = y;
     }
 
+    public int getX() {
+        return x;
+    }
 
+    public int getY() {
+        return y;
+    }
+
+    public Dir getDir() {
+        return dir;
+    }
 }

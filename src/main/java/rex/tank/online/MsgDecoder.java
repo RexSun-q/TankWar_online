@@ -37,6 +37,9 @@ public class MsgDecoder extends ByteToMessageDecoder {
             case TankStopMsg:
                 msg = new TankStopMsg();
                 break;
+            case NewBulletMsg:
+                msg = new NewBulletMsg();
+                break;
             default:
                 break;
         }

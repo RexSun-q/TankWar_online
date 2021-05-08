@@ -1,5 +1,7 @@
 package rex.tank;
 
+import rex.tank.online.Client;
+import rex.tank.online.NewBulletMsg;
 import rex.tank.online.TankMsg;
 
 import java.awt.*;
@@ -32,14 +34,15 @@ public class Tank {
         this.group = group;
     }
 
-    public Tank(TankMsg msg, TankFrame tf) {
+    public Tank(TankMsg msg, Group group, TankFrame tf) {
         this.x = msg.x;
         this.y = msg.y;
         this.dir = msg.dir;
         this.tf = tf;
         this.moving = msg.moving;
-        this.group = msg.group;
         this.uuid = msg.uuid;
+
+        this.group = group;
     }
 
     public void setMoving(Boolean isMoving) {
@@ -93,9 +96,10 @@ public class Tank {
                 break;
         }
 
-        if (group == Group.BAD && random.nextInt(100) > 85) fire();
-
-        if (group == Group.BAD && random.nextInt(100) > 96) randomRotate();
+        // 单机版电脑使用
+//        if (group == Group.BAD && random.nextInt(100) > 85) fire();
+//
+//        if (group == Group.BAD && random.nextInt(100) > 96) randomRotate();
 
         boundCheck();
     }
@@ -120,7 +124,9 @@ public class Tank {
     public void fire() {
         int xx = this.getX() + this.WIDTH / 2 - Bullet.width / 2;
         int yy = this.getY() + this.HEIGHT / 2 - Bullet.height / 2;
-        new Bullet(xx, yy, dir, getGroup(), tf);
+        Bullet bullet = new Bullet(xx, yy, dir, getGroup());
+        TankFrame.getINSTANCE().bulletList.add(bullet);
+        Client.getInstance().sendMsg(new NewBulletMsg(bullet));
     }
 
     public int getX() {
